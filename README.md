@@ -17,7 +17,7 @@ producer := messaging.NewProducer(consumerAddr)
 producer.Start()
 defer producer.Close()
 
-producer.SendAsync([]byte("Hello World!"))
+producer.EnsureSent([]byte("Hello World!"))
 ```
 
 Consumer:
