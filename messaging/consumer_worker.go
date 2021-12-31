@@ -42,6 +42,10 @@ func (this *ConsumerWorker) Start() {
 	}()
 }
 
+func (this *ConsumerWorker) Close() {
+	this.producer.Close()
+}
+
 // notice: the returned slice will not be reused in the next call
 func (this *ConsumerWorker) receive() (*dto.Frame, error) {
 	rxBytesSoFar, frame, err := utils.Receive(

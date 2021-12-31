@@ -10,6 +10,7 @@ type Publisher struct {
 	subscribers     []*net.TCPConn
 	subscriberMutex sync.RWMutex
 	listener        *net.TCPListener
+	isClosed        bool
 }
 
 func NewPublisher(listenAddress *net.TCPAddr) *Publisher {
@@ -20,6 +21,7 @@ func NewPublisher(listenAddress *net.TCPAddr) *Publisher {
 	this := &Publisher{
 		subscribers: make([]*net.TCPConn, 0),
 		listener:    listener,
+		isClosed:    false,
 	}
 	return this
 }
@@ -29,6 +31,9 @@ func (this *Publisher) Start() {
 		for {
 			conn, err := this.listener.AcceptTCP()
 			if err != nil {
+				if this.isClosed {
+					return
+				}
 				panic(err)
 			}
 			this.subscriberMutex.Lock()
@@ -36,6 +41,17 @@ func (this *Publisher) Start() {
 			this.subscriberMutex.Unlock()
 		}
 	}()
+}
+
+func (this *Publisher) Close() {
+	this.isClosed = true
+	this.listener.Close()
+	this.subscriberMutex.Lock()
+	for _, subscriber := range this.subscribers {
+		subscriber.Close()
+	}
+	this.subscribers = make([]*net.TCPConn, 0)
+	this.subscriberMutex.Unlock()
 }
 
 func (this *Publisher) Send(message []byte) {

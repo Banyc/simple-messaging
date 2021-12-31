@@ -14,6 +14,7 @@ func TestPubSub1(t *testing.T) {
 	}
 	pub := messaging.NewPublisher(publistenAddr)
 	pub.Start()
+	defer pub.Close()
 
 	pubAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
@@ -21,6 +22,7 @@ func TestPubSub1(t *testing.T) {
 	}
 	sub := messaging.NewSubscriber(pubAddr, 1024)
 	sub.Start()
+	defer sub.Close()
 
 	time.Sleep(time.Second)
 
@@ -38,6 +40,7 @@ func TestPubSub1_1(t *testing.T) {
 	}
 	pub := messaging.NewPublisher(publistenAddr)
 	pub.Start()
+	defer pub.Close()
 
 	pubAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
@@ -45,6 +48,7 @@ func TestPubSub1_1(t *testing.T) {
 	}
 	sub := messaging.NewSubscriber(pubAddr, 1)
 	sub.Start()
+	defer sub.Close()
 
 	time.Sleep(time.Second)
 
@@ -62,6 +66,7 @@ func TestPubSub2(t *testing.T) {
 	}
 	sub := messaging.NewSubscriber(pubAddr, 1024)
 	sub.Start()
+	defer sub.Close()
 
 	pubListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
@@ -69,6 +74,7 @@ func TestPubSub2(t *testing.T) {
 	}
 	pub := messaging.NewPublisher(pubListenAddr)
 	pub.Start()
+	defer pub.Close()
 
 	time.Sleep(time.Second * 3)
 
@@ -88,6 +94,7 @@ func TestPubSub3(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		sub := messaging.NewSubscriber(pubAddr, 1024)
 		sub.Start()
+		defer sub.Close()
 		subs = append(subs, sub)
 	}
 
@@ -97,6 +104,7 @@ func TestPubSub3(t *testing.T) {
 	}
 	pub := messaging.NewPublisher(pubListenAddr)
 	pub.Start()
+	defer pub.Close()
 
 	time.Sleep(time.Second * 3)
 
@@ -118,6 +126,7 @@ func TestPubSub4(t *testing.T) {
 	for i := 0; i < 10; i++ {
 		sub := messaging.NewSubscriber(pubAddr, 1024)
 		sub.Start()
+		defer sub.Close()
 		subs = append(subs, sub)
 	}
 
@@ -127,6 +136,7 @@ func TestPubSub4(t *testing.T) {
 	}
 	pub := messaging.NewPublisher(pubListenAddr)
 	pub.Start()
+	defer pub.Close()
 
 	time.Sleep(time.Second * 3)
 

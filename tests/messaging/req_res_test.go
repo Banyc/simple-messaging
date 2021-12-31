@@ -8,19 +8,21 @@ import (
 )
 
 func TestReqRes1(t *testing.T) {
-	consumerListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
+	consumerListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8079")
 	if err != nil {
 		t.Fatal(err)
 	}
 	consumer := messaging.NewConsumer(consumerListenAddr, 1024)
 	consumer.Start()
+	defer consumer.Close()
 
-	consumerAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
+	consumerAddr, err := net.ResolveTCPAddr("tcp", "localhost:8079")
 	if err != nil {
 		t.Fatal(err)
 	}
 	producer := messaging.NewProducer(consumerAddr)
 	producer.Start()
+	defer producer.Close()
 
 	time.Sleep(time.Second)
 
@@ -32,19 +34,21 @@ func TestReqRes1(t *testing.T) {
 }
 
 func TestReqRes1_1(t *testing.T) {
-	consumerListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
+	consumerListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8078")
 	if err != nil {
 		t.Fatal(err)
 	}
 	consumer := messaging.NewConsumer(consumerListenAddr, 1)
 	consumer.Start()
+	defer consumer.Close()
 
-	consumerAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
+	consumerAddr, err := net.ResolveTCPAddr("tcp", "localhost:8078")
 	if err != nil {
 		t.Fatal(err)
 	}
 	producer := messaging.NewProducer(consumerAddr)
 	producer.Start()
+	defer producer.Close()
 
 	time.Sleep(time.Second)
 

@@ -11,6 +11,7 @@ type Subscriber struct {
 	publisherAddress *net.TCPAddr
 	rxBuffer         []byte
 	rxBytesSoFar     []byte
+	isClosed         bool
 }
 
 func NewSubscriber(
@@ -20,6 +21,7 @@ func NewSubscriber(
 	this := &Subscriber{
 		publisherAddress: publisherAddress,
 		rxBuffer:         make([]byte, rxBufferSize),
+		isClosed:         false,
 	}
 	return this
 }
@@ -28,19 +30,34 @@ func (this *Subscriber) Start() {
 	go this.ensureReconnected()
 }
 
-func (this *Subscriber) ensureReconnected() {
+func (this *Subscriber) Close() {
+	this.isClosed = true
+	if this.publisher != nil {
+		this.publisher.Close()
+	}
+}
+
+// return true if successful
+func (this *Subscriber) ensureReconnected() bool {
 	if this.publisher != nil {
 		this.publisher.Close()
 	}
 	isSucceeded := this.connect()
 	for !isSucceeded {
+		if this.isClosed {
+			return false
+		}
 		time.Sleep(time.Second)
 		isSucceeded = this.connect()
 	}
+	return true
 }
 
 // return: is successful
 func (this *Subscriber) connect() bool {
+	if this.isClosed {
+		return false
+	}
 	conn, err := net.DialTCP("tcp", nil, this.publisherAddress)
 	if err != nil {
 		return false
@@ -76,11 +93,16 @@ func (this *Subscriber) Receive() ([]byte, error) {
 }
 
 // notice: the returned slice will not be reused in the next call
+// return nil if closed
 func (this *Subscriber) EnsureReceived() []byte {
 	for {
 		message, err := this.Receive()
 		if err != nil {
-			this.ensureReconnected()
+			ok := this.ensureReconnected()
+			if !ok {
+				// closed
+				return nil
+			}
 			continue
 		}
 		if message == nil {

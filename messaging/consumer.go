@@ -12,6 +12,7 @@ type Consumer struct {
 	consumerWorkers     []*ConsumerWorker
 	consumerWorkerMutex sync.RWMutex
 	rxFrames            chan *dto.Frame
+	isClosed            bool
 }
 
 func NewConsumer(
@@ -26,6 +27,7 @@ func NewConsumer(
 		listener:     listener,
 		rxBufferSize: rxBufferSize,
 		rxFrames:     make(chan *dto.Frame),
+		isClosed:     false,
 	}
 	return this
 }
@@ -35,6 +37,9 @@ func (this *Consumer) Start() {
 		for {
 			conn, err := this.listener.AcceptTCP()
 			if err != nil {
+				if this.isClosed {
+					return
+				}
 				panic(err)
 			}
 			this.consumerWorkerMutex.Lock()
@@ -50,6 +55,18 @@ func (this *Consumer) Start() {
 	}()
 }
 
+func (this *Consumer) Close() {
+	this.isClosed = true
+	this.listener.Close()
+	this.consumerWorkerMutex.Lock()
+	for _, consumerWorker := range this.consumerWorkers {
+		consumerWorker.Close()
+	}
+	this.consumerWorkers = make([]*ConsumerWorker, 0)
+	this.consumerWorkerMutex.Unlock()
+	close(this.rxFrames)
+}
+
 func (this *Consumer) ProducerClosed(consumerWorker *ConsumerWorker) {
 	this.consumerWorkerMutex.Lock()
 	for i, cw := range this.consumerWorkers {
@@ -62,10 +79,16 @@ func (this *Consumer) ProducerClosed(consumerWorker *ConsumerWorker) {
 }
 
 func (this *Consumer) ReceivedFrame(frame *dto.Frame) {
+	if this.isClosed {
+		return
+	}
 	this.rxFrames <- frame
 }
 
 func (this *Consumer) Receive() []byte {
 	frame := <-this.rxFrames
+	if frame == nil {
+		return nil
+	}
 	return frame.GetMessage()
 }
