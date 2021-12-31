@@ -9,6 +9,7 @@ import (
 type Producer struct {
 	consumerAddress *net.TCPAddr
 	consumer        *net.TCPConn
+	txMessages      chan []byte
 	isClosed        bool
 }
 
@@ -22,6 +23,7 @@ func NewProducer(consumerAddress *net.TCPAddr) *Producer {
 
 func (this *Producer) Start() {
 	go this.ensureReconnected()
+	go this.flushTXMessages()
 }
 
 func (this *Producer) Close() {
@@ -29,6 +31,7 @@ func (this *Producer) Close() {
 	if this.consumer != nil {
 		this.consumer.Close()
 	}
+	close(this.txMessages)
 }
 
 // return: is successful
@@ -65,7 +68,7 @@ func (this *Producer) connect() bool {
 }
 
 func (this *Producer) Send(message []byte) error {
-	if this.consumer == nil {
+	for this.consumer == nil {
 		// wait for consumer to be connected
 		time.Sleep(time.Second)
 	}
@@ -78,6 +81,13 @@ func (this *Producer) Send(message []byte) error {
 	return nil
 }
 
+func (this *Producer) SendAsync(message []byte) {
+	if this.isClosed {
+		return
+	}
+	this.txMessages <- message
+}
+
 // return: is successful
 func (this *Producer) EnsureSent(message []byte) bool {
 	for {
@@ -85,10 +95,24 @@ func (this *Producer) EnsureSent(message []byte) bool {
 		if err != nil {
 			ok := this.ensureReconnected()
 			if !ok {
+				// producer is closed
 				return false
 			}
 			continue
 		}
 		return true
+	}
+}
+
+func (this *Producer) flushTXMessages() {
+	for {
+		select {
+		case message := <-this.txMessages:
+			ok := this.EnsureSent(message)
+			if !ok {
+				// producer is closed
+				return
+			}
+		}
 	}
 }
