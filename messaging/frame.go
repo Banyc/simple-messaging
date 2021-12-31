@@ -6,17 +6,18 @@ type Frame struct {
 	message []byte
 }
 
-func RestoreFrame(frame []byte) *Frame {
+func RestoreFrame(frame []byte) (int, *Frame) {
 	if len(frame) < 4 {
-		return nil
+		return 0, nil
 	}
 	messageSize := binary.BigEndian.Uint32(frame[:4])
 	if len(frame)-4 < int(messageSize) {
-		return nil
+		return 0, nil
 	}
 
-	return &Frame{
-		message: frame[4 : 4+messageSize],
+	frameSize := messageSize + 4
+	return int(frameSize), &Frame{
+		message: frame[4:frameSize],
 	}
 }
 

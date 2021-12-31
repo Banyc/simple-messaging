@@ -59,6 +59,10 @@ func (this *Subscriber) Receive() ([]byte, error) {
 		// wait for publisher to be connected
 		time.Sleep(time.Second)
 	}
+	frame := this.restoreFrameFromRXBytesSoFar()
+	if frame != nil {
+		return frame.GetMessage(), nil
+	}
 	nr, err := this.publisher.Read(this.rxBuffer)
 	readByteCount = nr
 	if err != nil {
@@ -66,13 +70,20 @@ func (this *Subscriber) Receive() ([]byte, error) {
 	}
 	// it will always perform a deep copy in this case
 	this.rxBytesSoFar = append(this.rxBytesSoFar, this.rxBuffer[:readByteCount]...)
-	frame := RestoreFrame(this.rxBytesSoFar)
+	frame = this.restoreFrameFromRXBytesSoFar()
 	if frame == nil {
 		return nil, nil
 	}
-
-	this.rxBytesSoFar = nil
 	return frame.GetMessage(), nil
+}
+
+func (this *Subscriber) restoreFrameFromRXBytesSoFar() *Frame {
+	frameSize, frame := RestoreFrame(this.rxBytesSoFar)
+	if frame == nil {
+		return nil
+	}
+	this.rxBytesSoFar = this.rxBytesSoFar[frameSize:]
+	return frame
 }
 
 // notice: the returned slice will not be reused in the next call
