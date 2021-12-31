@@ -123,4 +123,16 @@ func TestPubSub4(t *testing.T) {
 			t.Fatal("Expected 'Hello World!' but got '" + string(subRecvBytes) + "'")
 		}
 	}
+	pub.Send([]byte("abc"))
+	pub.Send([]byte("def"))
+	for _, sub := range subs {
+		subRecvBytes := sub.EnsureReceived()
+		if string(subRecvBytes) != "abc" {
+			t.Fatal("Expected 'abc' but got '" + string(subRecvBytes) + "'")
+		}
+		subRecvBytes = sub.EnsureReceived()
+		if string(subRecvBytes) != "def" {
+			t.Fatal("Expected 'def' but got '" + string(subRecvBytes) + "'")
+		}
+	}
 }

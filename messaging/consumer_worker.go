@@ -18,6 +18,7 @@ func NewConsumerWorker(
 ) *ConsumerWorker {
 	this := &ConsumerWorker{
 		consumer: consumer,
+		producer: producer,
 		rxBuffer: make([]byte, rxBufferSize),
 	}
 	return this

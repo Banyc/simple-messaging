@@ -7,21 +7,24 @@ import (
 
 type Consumer struct {
 	listener            *net.TCPListener
+	rxBufferSize        int
 	consumerWorkers     []*ConsumerWorker
 	consumerWorkerMutex sync.RWMutex
-
-	rxFrames     chan *Frame
-	rxFrameMutex sync.RWMutex
+	rxFrames            chan *Frame
 }
 
-func NewConsumer(listenAddress *net.TCPAddr) *Consumer {
+func NewConsumer(
+	listenAddress *net.TCPAddr,
+	rxBufferSize int,
+) *Consumer {
 	listener, err := net.ListenTCP("tcp", listenAddress)
 	if err != nil {
 		panic(err)
 	}
 	this := &Consumer{
-		listener: listener,
-		rxFrames: make(chan *Frame),
+		listener:     listener,
+		rxBufferSize: rxBufferSize,
+		rxFrames:     make(chan *Frame),
 	}
 	return this
 }
@@ -34,12 +37,13 @@ func (this *Consumer) Start() {
 				panic(err)
 			}
 			this.consumerWorkerMutex.Lock()
-			this.consumerWorkers = append(this.consumerWorkers,
-				NewConsumerWorker(
-					this,
-					conn,
-					1024,
-				))
+			consumerWorker := NewConsumerWorker(
+				this,
+				conn,
+				this.rxBufferSize,
+			)
+			consumerWorker.Start()
+			this.consumerWorkers = append(this.consumerWorkers, consumerWorker)
 			this.consumerWorkerMutex.Unlock()
 		}
 	}()
@@ -57,14 +61,10 @@ func (this *Consumer) ProducerClosed(consumerWorker *ConsumerWorker) {
 }
 
 func (this *Consumer) ReceivedFrame(frame *Frame) {
-	this.rxFrameMutex.Lock()
 	this.rxFrames <- frame
-	this.rxFrameMutex.Unlock()
 }
 
 func (this *Consumer) Receive() []byte {
-	this.rxFrameMutex.Lock()
-	defer this.rxFrameMutex.Unlock()
 	frame := <-this.rxFrames
 	return frame.GetMessage()
 }
