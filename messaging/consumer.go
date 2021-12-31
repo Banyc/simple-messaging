@@ -2,6 +2,7 @@ package messaging
 
 import (
 	"net"
+	"simple-messaging/messaging/dto"
 	"sync"
 )
 
@@ -10,7 +11,7 @@ type Consumer struct {
 	rxBufferSize        int
 	consumerWorkers     []*ConsumerWorker
 	consumerWorkerMutex sync.RWMutex
-	rxFrames            chan *Frame
+	rxFrames            chan *dto.Frame
 }
 
 func NewConsumer(
@@ -24,7 +25,7 @@ func NewConsumer(
 	this := &Consumer{
 		listener:     listener,
 		rxBufferSize: rxBufferSize,
-		rxFrames:     make(chan *Frame),
+		rxFrames:     make(chan *dto.Frame),
 	}
 	return this
 }
@@ -60,7 +61,7 @@ func (this *Consumer) ProducerClosed(consumerWorker *ConsumerWorker) {
 	this.consumerWorkerMutex.Unlock()
 }
 
-func (this *Consumer) ReceivedFrame(frame *Frame) {
+func (this *Consumer) ReceivedFrame(frame *dto.Frame) {
 	this.rxFrames <- frame
 }
 

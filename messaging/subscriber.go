@@ -2,6 +2,7 @@ package messaging
 
 import (
 	"net"
+	"simple-messaging/messaging/utils"
 	"time"
 )
 
@@ -54,36 +55,24 @@ func (this *Subscriber) connect() bool {
 
 // notice: the returned slice will not be reused in the next call
 func (this *Subscriber) Receive() ([]byte, error) {
-	readByteCount := 0
 	for this.publisher == nil {
 		// wait for publisher to be connected
 		time.Sleep(time.Second)
 	}
-	frame := this.restoreFrameFromRXBytesSoFar()
-	if frame != nil {
-		return frame.GetMessage(), nil
-	}
-	nr, err := this.publisher.Read(this.rxBuffer)
-	readByteCount = nr
+
+	rxBytesSoFar, frame, err := utils.Receive(
+		this.publisher,
+		this.rxBuffer,
+		this.rxBytesSoFar,
+	)
+	this.rxBytesSoFar = rxBytesSoFar
 	if err != nil {
 		return nil, err
 	}
-	// it will always perform a deep copy in this case
-	this.rxBytesSoFar = append(this.rxBytesSoFar, this.rxBuffer[:readByteCount]...)
-	frame = this.restoreFrameFromRXBytesSoFar()
 	if frame == nil {
 		return nil, nil
 	}
-	return frame.GetMessage(), nil
-}
-
-func (this *Subscriber) restoreFrameFromRXBytesSoFar() *Frame {
-	frameSize, frame := RestoreFrame(this.rxBytesSoFar)
-	if frame == nil {
-		return nil
-	}
-	this.rxBytesSoFar = this.rxBytesSoFar[frameSize:]
-	return frame
+	return frame.GetMessage(), err
 }
 
 // notice: the returned slice will not be reused in the next call

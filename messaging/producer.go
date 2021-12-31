@@ -2,6 +2,7 @@ package messaging
 
 import (
 	"net"
+	"simple-messaging/messaging/dto"
 	"time"
 )
 
@@ -51,7 +52,7 @@ func (this *Producer) Send(message []byte) error {
 		// wait for consumer to be connected
 		time.Sleep(time.Second)
 	}
-	frame := NewFrame(message)
+	frame := dto.NewFrame(message)
 	frameBytes := frame.GetBytes()
 	_, err := this.consumer.Write(frameBytes)
 	if err != nil {

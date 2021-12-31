@@ -2,6 +2,7 @@ package messaging
 
 import (
 	"net"
+	"simple-messaging/messaging/dto"
 	"sync"
 )
 
@@ -38,7 +39,7 @@ func (this *Publisher) Start() {
 }
 
 func (this *Publisher) Send(message []byte) {
-	frame := NewFrame(message)
+	frame := dto.NewFrame(message)
 	frameBytes := frame.GetBytes()
 	deadSubscribers := make([]int, 0)
 	this.subscriberMutex.RLock()
