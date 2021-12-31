@@ -16,6 +16,7 @@ type Producer struct {
 func NewProducer(consumerAddress *net.TCPAddr) *Producer {
 	this := &Producer{
 		consumerAddress: consumerAddress,
+		txMessages:      make(chan []byte),
 		isClosed:        false,
 	}
 	return this
