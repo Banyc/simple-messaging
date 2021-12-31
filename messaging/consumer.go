@@ -56,6 +56,9 @@ func (this *Consumer) Start() {
 }
 
 func (this *Consumer) Close() {
+	if this.isClosed {
+		return
+	}
 	this.isClosed = true
 	this.listener.Close()
 	this.consumerWorkerMutex.Lock()
@@ -79,19 +82,35 @@ func (this *Consumer) ProducerClosed(consumerWorker *ConsumerWorker) {
 }
 
 func (this *Consumer) ReceivedFrame(frame *dto.Frame) {
+	if frame == nil {
+		panic("frame is nil")
+	}
+
 	if this.isClosed {
 		return
 	}
+	defer func() {
+		if r := recover(); r != nil {
+			// this object has been closed, ignore this frame
+			return
+		}
+	}()
 	this.rxFrames <- frame
 }
 
+// return nil if closed
 func (this *Consumer) Receive() []byte {
 	if this.isClosed {
+		// object has been closed
 		return nil
 	}
 	frame := <-this.rxFrames
-	if frame == nil {
+	if this.isClosed {
+		// channel has been closed
 		return nil
+	}
+	if frame == nil {
+		panic("Received nil frame")
 	}
 	return frame.GetMessage()
 }
