@@ -8,7 +8,7 @@ import (
 )
 
 func TestReqRes1(t *testing.T) {
-	consumerListenAddr, err := net.ResolveTCPAddr("tcp", ":8080")
+	consumerListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func TestReqRes1(t *testing.T) {
 }
 
 func TestReqRes1_1(t *testing.T) {
-	consumerListenAddr, err := net.ResolveTCPAddr("tcp", ":8080")
+	consumerListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
 		t.Fatal(err)
 	}

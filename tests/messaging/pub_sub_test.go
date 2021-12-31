@@ -8,7 +8,7 @@ import (
 )
 
 func TestPubSub1(t *testing.T) {
-	publistenAddr, err := net.ResolveTCPAddr("tcp", ":8080")
+	publistenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func TestPubSub1(t *testing.T) {
 }
 
 func TestPubSub1_1(t *testing.T) {
-	publistenAddr, err := net.ResolveTCPAddr("tcp", ":8080")
+	publistenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestPubSub2(t *testing.T) {
 	sub := messaging.NewSubscriber(pubAddr, 1024)
 	sub.Start()
 
-	pubListenAddr, err := net.ResolveTCPAddr("tcp", ":8080")
+	pubListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,7 +91,7 @@ func TestPubSub3(t *testing.T) {
 		subs = append(subs, sub)
 	}
 
-	pubListenAddr, err := net.ResolveTCPAddr("tcp", ":8080")
+	pubListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +121,7 @@ func TestPubSub4(t *testing.T) {
 		subs = append(subs, sub)
 	}
 
-	pubListenAddr, err := net.ResolveTCPAddr("tcp", ":8080")
+	pubListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
 		t.Fatal(err)
 	}
