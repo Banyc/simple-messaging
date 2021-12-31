@@ -86,6 +86,9 @@ func (this *Consumer) ReceivedFrame(frame *dto.Frame) {
 }
 
 func (this *Consumer) Receive() []byte {
+	if this.isClosed {
+		return nil
+	}
 	frame := <-this.rxFrames
 	if frame == nil {
 		return nil

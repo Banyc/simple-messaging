@@ -106,13 +106,14 @@ func (this *Producer) EnsureSent(message []byte) bool {
 
 func (this *Producer) flushTXMessages() {
 	for {
-		select {
-		case message := <-this.txMessages:
-			ok := this.EnsureSent(message)
-			if !ok {
-				// producer is closed
-				return
-			}
+		message := <-this.txMessages
+		if this.isClosed {
+			return
+		}
+		ok := this.EnsureSent(message)
+		if !ok {
+			// producer is closed
+			return
 		}
 	}
 }
