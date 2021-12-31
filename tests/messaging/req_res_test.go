@@ -27,9 +27,9 @@ func TestReqRes1(t *testing.T) {
 	time.Sleep(time.Second)
 
 	producer.Send([]byte("Hello World!"))
-	subRecvBytes := consumer.Receive()
-	if string(subRecvBytes) != "Hello World!" {
-		t.Fatal("Expected 'Hello World!' but got '" + string(subRecvBytes) + "'")
+	consumerRecvBytes := consumer.Receive()
+	if string(consumerRecvBytes) != "Hello World!" {
+		t.Fatal("Expected 'Hello World!' but got '" + string(consumerRecvBytes) + "'")
 	}
 }
 
@@ -53,8 +53,8 @@ func TestReqRes1_1(t *testing.T) {
 	time.Sleep(time.Second)
 
 	producer.Send([]byte("Hello World!"))
-	subRecvBytes := consumer.Receive()
-	if string(subRecvBytes) != "Hello World!" {
-		t.Fatal("Expected 'Hello World!' but got '" + string(subRecvBytes) + "'")
+	consumerRecvBytes := consumer.Receive()
+	if string(consumerRecvBytes) != "Hello World!" {
+		t.Fatal("Expected 'Hello World!' but got '" + string(consumerRecvBytes) + "'")
 	}
 }

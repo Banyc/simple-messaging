@@ -8,11 +8,11 @@ import (
 )
 
 func TestPubSub1(t *testing.T) {
-	publistenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
+	pubListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
 		t.Fatal(err)
 	}
-	pub := messaging.NewPublisher(publistenAddr)
+	pub := messaging.NewPublisher(pubListenAddr)
 	pub.Start()
 	defer pub.Close()
 
@@ -34,11 +34,11 @@ func TestPubSub1(t *testing.T) {
 }
 
 func TestPubSub1_1(t *testing.T) {
-	publistenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
+	pubListenAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {
 		t.Fatal(err)
 	}
-	pub := messaging.NewPublisher(publistenAddr)
+	pub := messaging.NewPublisher(pubListenAddr)
 	pub.Start()
 	defer pub.Close()
 
