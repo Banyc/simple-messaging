@@ -63,3 +63,7 @@ defer pub.Close()
 
 pub.Send([]byte("Hello World!"))
 ```
+
+# TODO
+
+-   [ ]  Receivers confirm receipt of messages via reply

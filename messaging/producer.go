@@ -71,6 +71,7 @@ func (this *Producer) Send(message []byte) error {
 	}
 	frame := dto.NewFrame(message)
 	frameBytes := frame.GetBytes()
+	// notice: write might success even if the connection is closed by peer
 	_, err := this.consumer.Write(frameBytes)
 	if err != nil {
 		return err
