@@ -10,7 +10,6 @@ type Consumer struct {
 	consumerWorkers     []*ConsumerWorker
 	consumerWorkerMutex sync.RWMutex
 
-	// rxFrames     []*Frame
 	rxFrames     chan *Frame
 	rxFrameMutex sync.RWMutex
 }
@@ -22,6 +21,7 @@ func NewConsumer(listenAddress *net.TCPAddr) *Consumer {
 	}
 	this := &Consumer{
 		listener: listener,
+		rxFrames: make(chan *Frame),
 	}
 	return this
 }
@@ -58,7 +58,6 @@ func (this *Consumer) ProducerClosed(consumerWorker *ConsumerWorker) {
 
 func (this *Consumer) ReceivedFrame(frame *Frame) {
 	this.rxFrameMutex.Lock()
-	// this.rxFrames = append(this.rxFrames, frame)
 	this.rxFrames <- frame
 	this.rxFrameMutex.Unlock()
 }
@@ -66,11 +65,6 @@ func (this *Consumer) ReceivedFrame(frame *Frame) {
 func (this *Consumer) Receive() []byte {
 	this.rxFrameMutex.Lock()
 	defer this.rxFrameMutex.Unlock()
-	// if len(this.rxFrames) == 0 {
-	// 	return nil
-	// }
-	// frame := this.rxFrames[0]
-	// this.rxFrames = this.rxFrames[1:]
 	frame := <-this.rxFrames
 	return frame.GetMessage()
 }
