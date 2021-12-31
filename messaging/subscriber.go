@@ -94,6 +94,9 @@ func (this *Subscriber) EnsureReceived() []byte {
 			this.ensureReconnected()
 			continue
 		}
+		if message == nil {
+			continue
+		}
 		return message
 	}
 }

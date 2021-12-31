@@ -31,6 +31,30 @@ func TestPubSub1(t *testing.T) {
 	}
 }
 
+func TestPubSub1_1(t *testing.T) {
+	publistenAddr, err := net.ResolveTCPAddr("tcp", ":8080")
+	if err != nil {
+		t.Fatal(err)
+	}
+	pub := messaging.NewPublisher(publistenAddr)
+	pub.Start()
+
+	pubAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
+	if err != nil {
+		t.Fatal(err)
+	}
+	sub := messaging.NewSubscriber(pubAddr, 1)
+	sub.Start()
+
+	time.Sleep(time.Second)
+
+	pub.Send([]byte("Hello World!"))
+	subRecvBytes := sub.EnsureReceived()
+	if string(subRecvBytes) != "Hello World!" {
+		t.Fatal("Expected 'Hello World!' but got '" + string(subRecvBytes) + "'")
+	}
+}
+
 func TestPubSub2(t *testing.T) {
 	pubAddr, err := net.ResolveTCPAddr("tcp", "localhost:8080")
 	if err != nil {

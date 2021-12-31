@@ -32,6 +32,9 @@ func (this *ConsumerWorker) Start() {
 				this.consumer.ProducerClosed(this)
 				return
 			}
+			if frame == nil {
+				continue
+			}
 			this.consumer.ReceivedFrame(frame)
 		}
 	}()
