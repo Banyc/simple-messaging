@@ -67,3 +67,4 @@ pub.Send([]byte("Hello World!"))
 # TODO
 
 -   [ ]  Receivers confirm receipt of messages via reply
+    -   make sure every message is delivered at least once
