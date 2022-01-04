@@ -2,8 +2,9 @@ package messaging_test
 
 import (
 	"net"
-	"simple-messaging/messaging"
 	"testing"
+
+	"github.com/banyc/simple-messaging/messaging"
 )
 
 func TestReqRes1(t *testing.T) {

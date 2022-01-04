@@ -2,7 +2,8 @@ package utils
 
 import (
 	"net"
-	"simple-messaging/messaging/dto"
+
+	"github.com/banyc/simple-messaging/messaging/dto"
 )
 
 // notice: the returned slice will not be reused in the next call

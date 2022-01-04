@@ -2,8 +2,9 @@ package messaging
 
 import (
 	"net"
-	"simple-messaging/messaging/dto"
-	"simple-messaging/messaging/utils"
+
+	"github.com/banyc/simple-messaging/messaging/dto"
+	"github.com/banyc/simple-messaging/messaging/utils"
 )
 
 type ConsumerWorker struct {

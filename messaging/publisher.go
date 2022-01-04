@@ -2,8 +2,9 @@ package messaging
 
 import (
 	"net"
-	"simple-messaging/messaging/dto"
 	"sync"
+
+	"github.com/banyc/simple-messaging/messaging/dto"
 )
 
 type Publisher struct {

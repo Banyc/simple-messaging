@@ -2,8 +2,9 @@ package messaging
 
 import (
 	"net"
-	"simple-messaging/messaging/dto"
 	"time"
+
+	"github.com/banyc/simple-messaging/messaging/dto"
 )
 
 type Producer struct {

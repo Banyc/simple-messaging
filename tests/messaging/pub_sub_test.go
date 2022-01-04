@@ -2,10 +2,11 @@ package messaging_test
 
 import (
 	"net"
-	"simple-messaging/messaging"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/banyc/simple-messaging/messaging"
 )
 
 func TestPubSub1(t *testing.T) {

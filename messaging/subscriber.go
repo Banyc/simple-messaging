@@ -2,8 +2,9 @@ package messaging
 
 import (
 	"net"
-	"simple-messaging/messaging/utils"
 	"time"
+
+	"github.com/banyc/simple-messaging/messaging/utils"
 )
 
 type Subscriber struct {
